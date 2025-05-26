@@ -4,7 +4,7 @@ import java.io.*;
 public class GenerateData {
 
     private static final String[] WORDS = {"Dragon", "Empire", "Quest", "Galaxy", "Legends", "Warrior", "Shadow", "Blade", "Chronicles", "Revenge"};
-    private static final String[] CATEGORIES = {"Acción", "Aventura", "Estrategia", "RPG", "Deportes", "Simulación"};
+    private static final String[] CATEGORIES = {"Accion", "Aventura", "Estrategia", "RPG", "Deportes", "Simulacion"};
     private static final Random random = new Random();
 
     public static ArrayList<Main.Game> generateGames(int n) {
