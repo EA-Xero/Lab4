@@ -77,7 +77,7 @@ public static void main(String[] args) {
                             }
                        break;
                        case 2:
-                           String[] algorithms1 = {"mergeSort","collectionSort","quickSort"};
+                           String[] algorithms1 = {"countingSort","mergeSort","collectionSort","quickSort"};
                            for (String algo : algorithms1) {
                                long startTime = System.nanoTime();
                                dataset.sortByAlgorithm(algo, criterio);
@@ -105,24 +105,29 @@ public static void main(String[] args) {
                 op4 = sc.nextInt();
                 int z=1;
                 ArrayList<Game> result = null;
+                long startTime = 0, endTime = 0;
                 switch (op4){
                 case 1:
-                        System.out.println("\n Inserte el precio a buscar \n");
-                        int precio = sc.nextInt();
-                        result = dataset.getGamesByPrice(precio);
-                        System.out.println("cantidad de resultados: " + result.size() + "\n \n");
-                        z = 1;
-                        for (Game g : result) {
-                            System.out.printf("%d. %s %n", z, g.toString());
-                            z++;
-                        }
-                        System.out.println("\n \n");
-                        break;
+                    System.out.println("\n Inserte el precio a buscar \n");
+                    int precio = sc.nextInt();
+                    startTime = System.nanoTime();
+                    result = dataset.getGamesByPrice(precio);
+                    System.out.println("cantidad de resultados: " + result.size() + "\n \n");
+                    z = 1;
+                    for (Game g : result) {
+                        System.out.printf("%d. %s %n", z, g.toString());
+                        z++;
+                    }
+                    endTime = System.nanoTime();
+                    System.out.println("\n \n");
+                    System.out.printf("Tiempo: %s ms %n", (endTime - startTime) / 1000000);
+                    break;
                 case 2:
                     System.out.println("\n Inserte el precio minimo\n");
                     int min = sc.nextInt();
                     System.out.println("\n Inserte el precio maximo\n");
                     int max = sc.nextInt();
+                    startTime = System.nanoTime();
                     result = dataset.getGamesByPriceRange(min,max);
                     System.out.println("cantidad de resultados: " + result.size() + "\n \n");
                     z = 1;
@@ -130,12 +135,15 @@ public static void main(String[] args) {
                         System.out.printf("%d. %s %n", z, g.toString());
                         z++;
                     }
+                    endTime = System.nanoTime();
                     System.out.println("\n \n");
+                    System.out.printf("Tiempo: %s ms %n", (endTime - startTime) / 1000000);
                     break;
                 case 3:
                     System.out.println("\n Inserte la categoria a buscar (Accion, Aventura, Estrategia, RPG, Deportes, Simulacion)\n");
                     sc.nextLine();
                     String Categoria = sc.next();
+                    startTime = System.nanoTime();
                     result = dataset.getGamesByCategory(Categoria);
                     System.out.println("cantidad de resultados: " + result.size() + "\n \n");
                     z= 1;
@@ -143,11 +151,14 @@ public static void main(String[] args) {
                         System.out.printf("%d. %s %n", z, g.toString());
                         z++;
                     }
+                    endTime = System.nanoTime();
                     System.out.println("\n \n");
+                    System.out.printf("Tiempo: %s ms %n", (endTime - startTime) / 1000000);
                     break;
                 case 4:
                     System.out.println("\n Inserte la calidad a buscar\n");
                     int calidad = sc.nextInt();
+                    startTime = System.nanoTime();
                     result = dataset.getGamesByQuality(calidad);
                     System.out.println("cantidad de resultados: " + result.size() + "\n \n");
                     z = 1;
@@ -155,7 +166,9 @@ public static void main(String[] args) {
                         System.out.printf("%d. %s %n", z, g.toString());
                         z++;
                     }
+                    endTime = System.nanoTime();
                     System.out.println("\n \n");
+                    System.out.printf("Tiempo: %s ms %n", (endTime - startTime) / 1000000);
                     break;
                  default:
                     System.out.println("\n Opcion invalida \n");
@@ -318,6 +331,7 @@ public static void main(String[] args) {
                 }
             } else {
                 System.out.printf("Dataset no esta ordenado por precio, utilizando busqueda lineal! \n");
+                long starttime = System.nanoTime();
                 for (Game g : data) {
                     if (g.getPrecio() >= min && g.getPrecio() <= max) {
                         result.add(g);
@@ -333,7 +347,6 @@ public static void main(String[] args) {
                 System.out.printf("Dataset esta ordenado por categoria, utilizando busqueda binaria! \n");
                 int left = 0, right = data.size() - 1;
                 int startIndex = -1;
-
                 while (left <= right) {
                     int mid = (left + right) / 2;
                     String midCat = data.get(mid).getCategoria();
@@ -449,12 +462,19 @@ public static void main(String[] args) {
                     System.out.println("Sorting with Quick Sort \n");
                     quickSortIterative(comparator);
                     break;
+                case "countingsort":
+                    if (!attribute.equals("calidad")) {
+                        System.out.println("Counting Sort solo está implementado para el atributo 'calidad' (quality).\n");
+                    } else {
+                        countingSortByQuality();
+                    }
+                    break;
                 default:
                     System.out.println("Sorting with Default Java Sort \n");
                     Collections.sort(data, comparator);
                     break;
             }
-            sortedByAttribute = attribute;
+
         }
 
         private void bubbleSort(Comparator<Game> comp) {
@@ -495,6 +515,32 @@ public static void main(String[] args) {
                 }
             }
         }
+
+        private void countingSortByQuality() {
+            System.out.println("Sorting with Counting Sort \n");
+            int maxQuality = 100;
+            int[] count = new int[maxQuality + 1];
+            ArrayList<Game> output = new ArrayList<>(Collections.nCopies(data.size(), (Game) null));
+
+            for (Game g : data) {
+                count[g.getCalidad()]++;
+            }
+
+            for (int i = 1; i <= maxQuality; i++) {
+                count[i] += count[i - 1];
+            }
+
+            for (int i = data.size() - 1; i >= 0; i--) {
+                Game g = data.get(i);
+                int calidad = g.getCalidad();
+                output.set(count[calidad] - 1, g);
+                count[calidad]--;
+            }
+
+            data = output;
+            sortedByAttribute = "calidad";
+        }
+
 
         private ArrayList<Game> mergeSort(ArrayList<Game> list, Comparator<Game> comp) {
             if (list.size() <= 1) return list;
